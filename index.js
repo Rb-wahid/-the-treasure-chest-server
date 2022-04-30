@@ -21,6 +21,14 @@ const run = async () => {
     const inventoryCollection = await client
       .db("service")
       .collection("products");
+
+    app.get("/inventory", async (req, res) => {
+      const query = {};
+      const cursor = await inventoryCollection.find(query);
+      const inventoryList = await cursor.toArray();
+
+      res.send(inventoryList);
+    });
   } finally {
   }
 };
