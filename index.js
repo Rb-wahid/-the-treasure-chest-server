@@ -54,6 +54,13 @@ const run = async () => {
       );
       res.send(result);
     });
+
+    app.post("/addinventory", async (req, res) => {
+      const { body } = req;
+      console.log(body);
+      const result = await inventoryCollection.insertOne(body);
+      res.send(result);
+    });
   } finally {
   }
 };
