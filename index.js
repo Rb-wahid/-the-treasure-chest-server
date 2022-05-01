@@ -37,6 +37,23 @@ const run = async () => {
 
       res.send(inventoryItem);
     });
+
+    app.post("/updateinventory/:id", async (req, res) => {
+      const { id } = req.params;
+      const { quantity, sold } = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const update = {
+        $set: { quantity, sold },
+      };
+
+      const result = await inventoryCollection.updateOne(
+        filter,
+        update,
+        options
+      );
+      res.send(result);
+    });
   } finally {
   }
 };
