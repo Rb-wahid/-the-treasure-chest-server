@@ -60,12 +60,15 @@ const run = async () => {
       res.send(inventoryList);
     });
 
-    app.get("/inventory/:id", async (req, res) => {
+    app.get("/inventory/:id", verifyJWT, async (req, res) => {
+      const emailDecode = req.decoded.email;
+      const { email } = req.query;
       const { id } = req.params;
       const query = { _id: ObjectId(id) };
-      const inventoryItem = await inventoryCollection.findOne(query);
-
-      res.send(inventoryItem);
+      if (email === emailDecode) {
+        const inventoryItem = await inventoryCollection.findOne(query);
+        res.send(inventoryItem);
+      } else res.status(403).send({ message: "Forbidden access" });
     });
 
     app.post("/updateinventory/:id", async (req, res) => {
