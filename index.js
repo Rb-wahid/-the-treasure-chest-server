@@ -28,14 +28,15 @@ const run = async () => {
 
     app.post("/gettoken", async (req, res) => {
       const { email } = req.query;
-      jwt.sign(
-        { email },
-        process.env.PRIVATE_KEY,
-        {
-          expiresIn: "1d",
-        },
-        (err, token) => res.send(token)
-      );
+      // jwt.sign(
+      //   { email },
+      //   process.env.PRIVATE_KEY,
+      //   {
+      //     expiresIn: "1d",
+      //   },
+      //   (err, token) => res.send(token)
+      // );
+      res.send({mes:"ok"})
     });
 
     app.get("/inventory", async (req, res) => {
