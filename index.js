@@ -60,18 +60,17 @@ const run = async () => {
       res.send(inventoryList);
     });
 
-    app.get("/inventory/:id", verifyJWT, async (req, res) => {
-      const emailDecode = req.decoded.email;
-      const { email } = req.query;
+    app.get("/inventory/:id", async (req, res) => {
       const { id } = req.params;
       const query = { _id: ObjectId(id) };
-      if (email === emailDecode) {
-        const inventoryItem = await inventoryCollection.findOne(query);
-        res.send(inventoryItem);
-      } else res.status(403).send({ message: "Forbidden access" });
+      const inventoryItem = await inventoryCollection.findOne(query);
+      res.send(inventoryItem);
     });
 
-    app.post("/updateinventory/:id", async (req, res) => {
+    app.post("/updateinventory/:id", verifyJWT, async (req, res) => {
+      const emailDecode = req.decoded.email;
+      const { email } = req.query;
+
       const { id } = req.params;
       const { quantity, sold } = req.body;
       const filter = { _id: ObjectId(id) };
@@ -79,13 +78,14 @@ const run = async () => {
       const update = {
         $set: { quantity, sold },
       };
-
-      const result = await inventoryCollection.updateOne(
-        filter,
-        update,
-        options
-      );
-      res.send(result);
+      if (email === emailDecode) {
+        const result = await inventoryCollection.updateOne(
+          filter,
+          update,
+          options
+        );
+        res.send(result);
+      } else res.status(403).send({ message: "Forbidden access" });
     });
 
     app.post("/addinventory", async (req, res) => {
