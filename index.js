@@ -88,11 +88,16 @@ const run = async () => {
       } else res.status(403).send({ message: "Forbidden access" });
     });
 
-    app.post("/addinventory", async (req, res) => {
+    app.post("/addinventory", verifyJWT, async (req, res) => {
+      const emailDecode = req.decoded.email;
+      const { email } = req.query;
+
       const { body } = req;
-      console.log(body);
-      const result = await inventoryCollection.insertOne(body);
-      res.send(result);
+      if (email === emailDecode) {
+        console.log("match add ");
+        const result = await inventoryCollection.insertOne(body);
+        res.send(result);
+      } else res.status(403).send({ message: "Forbidden access" });
     });
 
     app.delete("/delete/:id", async (req, res) => {
