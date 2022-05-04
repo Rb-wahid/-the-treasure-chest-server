@@ -94,18 +94,21 @@ const run = async () => {
 
       const { body } = req;
       if (email === emailDecode) {
-        console.log("match add ");
         const result = await inventoryCollection.insertOne(body);
         res.send(result);
       } else res.status(403).send({ message: "Forbidden access" });
     });
 
-    app.delete("/delete/:id", async (req, res) => {
+    app.delete("/delete/:id", verifyJWT, async (req, res) => {
+      const emailDecode = req.decoded.email;
+      const { email } = req.query;
       const { id } = req.params;
 
       const query = { _id: ObjectId(id) };
-      const result = await inventoryCollection.deleteOne(query);
-      res.send(result);
+      if (email === emailDecode) {
+        const result = await inventoryCollection.deleteOne(query);
+        res.send(result);
+      } else res.status(403).send({ message: "Forbidden access" });
     });
   } finally {
   }
