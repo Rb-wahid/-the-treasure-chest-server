@@ -2,7 +2,6 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const res = require("express/lib/response");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 const app = express();
@@ -15,6 +14,21 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
+
+const verifyJWT = async (req, res, next) => {
+  const { auth } = req.headers;
+  if (!auth) {
+    return res.status(401).send({ message: "Unauthorized access" });
+  }
+  await jwt.verify(auth, process.env.PRIVATE_KEY, (err, decoded) => {
+    if (err) {
+      console.log(err);
+      return res.status(403).send({ message: "Forbidden access" });
+    }
+    req.decoded = decoded;
+  });
+  next();
+};
 
 const run = async () => {
   try {
@@ -34,7 +48,7 @@ const run = async () => {
         {
           expiresIn: "1d",
         },
-        (err, token) => res.send({token})
+        (err, token) => res.send({ token })
       );
     });
 
