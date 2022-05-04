@@ -34,7 +34,7 @@ const run = async () => {
         {
           expiresIn: "1d",
         },
-        (err, token) => res.send(token)
+        (err, token) => res.send({token})
       );
     });
 
