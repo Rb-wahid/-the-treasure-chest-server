@@ -2,6 +2,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const res = require("express/lib/response");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 const app = express();
@@ -27,11 +28,14 @@ const run = async () => {
 
     app.post("/gettoken", async (req, res) => {
       const { email } = req.query;
-      console.log(email);
-      const token = await jwt.sign({ email }, process.env.PRIVATE_KEY, {
-        expiresIn: "1d",
-      });
-      res.send(token);
+      jwt.sign(
+        { email },
+        process.env.PRIVATE_KEY,
+        {
+          expiresIn: "1d",
+        },
+        (err, token) => res.send(token)
+      );
     });
 
     app.get("/inventory", async (req, res) => {
