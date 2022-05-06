@@ -41,15 +41,17 @@ const run = async () => {
     // JWT Auth
 
     app.post("/gettoken", async (req, res) => {
-      const { email } = req.query;
-      return jwt.sign(
-        { email },
-        process.env.PRIVATE_KEY,
-        {
-          expiresIn: "1d",
-        },
-        (err, token) => res.send({ token })
-      );
+      if (req.query.email) {
+        const { email } = req.query;
+        return jwt.sign(
+          { email },
+          process.env.PRIVATE_KEY,
+          {
+            expiresIn: "1d",
+          },
+          (err, token) => res.send({ token })
+        );
+      } else res.send({ message: "email is undefined" });
     });
 
     app.get("/inventory", async (req, res) => {
