@@ -68,6 +68,21 @@ const run = async () => {
       res.send(inventoryItem);
     });
 
+    // Filter by email
+    app.get("/myinventory", verifyJWT, async (req, res) => {
+      const emailDecode = req.decoded.email;
+      const { email } = req.query;
+      if (email !== "undefined" && emailDecode !== "undefined") {
+        if (emailDecode === email) {
+          const filter = { email };
+          const cursor = await inventoryCollection.find(filter);
+          const inventoryList = await cursor.toArray();
+
+          res.send(inventoryList);
+        } else res.status(403).send({ message: "Forbidden access" });
+      } else res.status(400).send({ message: "Please provide valid email" });
+    });
+
     app.post("/updateinventory/:id", verifyJWT, async (req, res) => {
       const emailDecode = req.decoded.email;
       const { email } = req.query;
