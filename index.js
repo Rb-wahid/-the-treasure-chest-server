@@ -22,8 +22,7 @@ const verifyJWT = async (req, res, next) => {
   }
   await jwt.verify(auth, process.env.PRIVATE_KEY, (err, decoded) => {
     if (err) {
-      console.log(err);
-      return res.status(403).send({ message: "Forbidden access" });
+      return res.status(403).send({ err });
     }
     req.decoded = decoded;
   });
