@@ -50,7 +50,7 @@ const run = async () => {
           },
           (err, token) => res.send({ token })
         );
-      } else res.send({ message: "email is undefined" });
+      } else res.status(400).send({ message: "Please provide valid email" });
     });
 
     app.get("/inventory", async (req, res) => {
@@ -72,7 +72,7 @@ const run = async () => {
     app.get("/myinventory", verifyJWT, async (req, res) => {
       const emailDecode = req.decoded.email;
       const { email } = req.query;
-      if (email !== "undefined" && emailDecode !== "undefined") {
+      if (email !== "undefined") {
         if (emailDecode === email) {
           const filter = { email };
           const cursor = await inventoryCollection.find(filter);
@@ -94,14 +94,16 @@ const run = async () => {
       const update = {
         $set: { quantity, sold },
       };
-      if (email === emailDecode) {
-        const result = await inventoryCollection.updateOne(
-          filter,
-          update,
-          options
-        );
-        res.send(result);
-      } else res.status(403).send({ message: "Forbidden access" });
+      if (email !== "undefined") {
+        if (email === emailDecode) {
+          const result = await inventoryCollection.updateOne(
+            filter,
+            update,
+            options
+          );
+          res.send(result);
+        } else res.status(403).send({ message: "Forbidden access" });
+      } else res.status(400).send({ message: "Please provide valid email" });
     });
 
     app.post("/addinventory", verifyJWT, async (req, res) => {
@@ -109,10 +111,12 @@ const run = async () => {
       const { email } = req.query;
 
       const { body } = req;
-      if (email === emailDecode) {
-        const result = await inventoryCollection.insertOne(body);
-        res.send(result);
-      } else res.status(403).send({ message: "Forbidden access" });
+      if (email !== "undefined") {
+        if (email === emailDecode) {
+          const result = await inventoryCollection.insertOne(body);
+          res.send(result);
+        } else res.status(403).send({ message: "Forbidden access" });
+      } else res.status(400).send({ message: "Please provide valid email" });
     });
 
     app.delete("/delete/:id", verifyJWT, async (req, res) => {
@@ -121,10 +125,12 @@ const run = async () => {
       const { id } = req.params;
 
       const query = { _id: ObjectId(id) };
-      if (email === emailDecode) {
-        const result = await inventoryCollection.deleteOne(query);
-        res.send(result);
-      } else res.status(403).send({ message: "Forbidden access" });
+      if (email !== "undefined") {
+        if (email === emailDecode) {
+          const result = await inventoryCollection.deleteOne(query);
+          res.send(result);
+        } else res.status(403).send({ message: "Forbidden access" });
+      } else res.status(400).send({ message: "Please provide valid email" });
     });
   } finally {
   }
