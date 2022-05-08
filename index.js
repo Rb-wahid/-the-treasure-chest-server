@@ -53,6 +53,27 @@ const run = async () => {
       } else res.status(400).send({ message: "Please provide valid email" });
     });
 
+    app.get("/inventorycount", async (req, res) => {
+      const count = await inventoryCollection.estimatedDocumentCount();
+      console.log({ count: count });
+      res.send({ count: count });
+    });
+
+    app.get("/getInventory", async (req, res) => {
+      let { page, count } = req.query;
+
+      if (page && count) {
+        page = parseInt(page);
+        count = parseInt(count);
+        const cursor = await inventoryCollection
+          .find({})
+          .skip(page * count)
+          .limit(count);
+        const inventoryList = await cursor.toArray();
+        res.send(inventoryList);
+      }
+    });
+
     app.get("/inventory", async (req, res) => {
       const query = {};
       const cursor = await inventoryCollection.find(query);
